@@ -1,0 +1,56 @@
+from collections import deque
+
+goal = [[1,2,3],
+        [4,5,6],
+        [7,8,0]]
+
+moves = [(-1,0), (1,0), (0,-1), (0,1)]
+
+def find_zero(state):
+    for i in range(3):
+        for j in range(3):
+            if state[i][j] == 0:
+                return i, j
+
+def is_goal(state):
+    return state == goal
+
+def state_to_tuple(state):
+    return tuple(num for row in state for num in row)
+
+def get_neighbors(state):
+    x, y = find_zero(state)
+    neighbors = []
+    for dx, dy in moves:
+        nx, ny = x + dx, y + dy
+        if 0 <= nx < 3 and 0 <= ny < 3:
+            new_state = [row[:] for row in state]
+            new_state[x][y], new_state[nx][ny] = new_state[nx][ny], new_state[x][y]
+            neighbors.append(new_state)
+    return neighbors
+
+print("Enter initial state (0 for blank):")
+start = [list(map(int, input().split())) for _ in range(3)]
+
+visited = set()
+queue = deque([start])
+
+found = False
+while queue:
+    state = queue.popleft()
+    if is_goal(state):
+        found = True
+        print("Goal reached:")
+        for row in state:
+            print(row)
+        break
+
+    visited.add(state_to_tuple(state))
+
+    for neighbor in get_neighbors(state):
+        t_neighbor = state_to_tuple(neighbor)
+        if t_neighbor not in visited:
+            queue.append(neighbor)
+
+if not found:
+    print("No solution found.")

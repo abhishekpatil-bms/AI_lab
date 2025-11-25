@@ -1,0 +1,49 @@
+from collections import deque
+
+goal = [[1,2,3],
+        [4,5,6],
+        [7,8,0]]
+
+moves = [(-1,0), (1,0), (0,-1), (0,1)]
+
+def find_zero(state):
+    for i in range(3):
+        for j in range(3):
+            if state[i][j] == 0:
+                return i, j
+
+def is_goal(state):
+    return state == goal
+
+def dfs(state, visited, depth_limit):
+    if is_goal(state):
+        return True
+    if depth_limit == 0:
+        return False
+
+    x, y = find_zero(state)
+    visited.append([row[:] for row in state])
+
+    for dx, dy in moves:
+        nx, ny = x + dx, y + dy
+        if 0 <= nx < 3 and 0 <= ny < 3:
+            
+            state[x][y], state[nx][ny] = state[nx][ny], state[x][y]
+
+            if not any(state == v for v in visited):
+                if dfs(state, visited, depth_limit -1):
+                    return True
+
+            state[x][y], state[nx][ny] = state[nx][ny], state[x][y]
+
+    return False
+
+print("Enter initial state (0 for blank):")
+start = [list(map(int, input().split())) for _ in range(3)]
+
+if dfs(start, [], 20):
+    print("Goal reached:")
+    for row in start:
+        print(row)
+else:
+    print("No solution found within depth limit.")

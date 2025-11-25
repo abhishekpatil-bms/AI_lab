@@ -1,0 +1,54 @@
+goal = [[1,2,3],
+        [4,5,6],
+        [7,8,0]]
+
+moves = [(-1,0), (1,0), (0,-1), (0,1)] 
+
+def find_zero(state):
+    for i in range(3):
+        for j in range(3):
+            if state[i][j] == 0:
+                return i, j
+
+def is_goal(state):
+    return state == goal
+
+def dls(state, depth, visited):
+    if is_goal(state):
+        return True
+    if depth == 0:
+        return False
+
+    x, y = find_zero(state)
+    visited.append([row[:] for row in state])
+
+    for dx, dy in moves:
+        nx, ny = x + dx, y + dy
+        if 0 <= nx < 3 and 0 <= ny < 3:
+
+            state[x][y], state[nx][ny] = state[nx][ny], state[x][y]
+
+            if not any(state == v for v in visited):
+                if dls(state, depth - 1, visited):
+                    return True
+
+            state[x][y], state[nx][ny] = state[nx][ny], state[x][y]
+
+    return False
+
+def iddfs(start, max_depth):
+    for depth in range(max_depth + 1):
+        visited = []
+        if dls(start, depth, visited):
+            return True
+    return False
+
+print("Enter the initial 8-puzzle state row-wise (0 for blank):")
+start = [list(map(int, input().split())) for _ in range(3)]
+
+if iddfs(start, 20):
+    print("Goal reached:")
+    for row in start:
+        print(row)
+else:
+    print("No solution found within depth limit.")
